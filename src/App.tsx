@@ -1,11 +1,11 @@
 import React from "react"
-import Router from "./router"
+import IndexRouter from "./router"
 import "./App.css"
 
 function App() {
   return (
     <div className="App">
-      <Router></Router>
+      <IndexRouter></IndexRouter>
     </div>
   )
 }

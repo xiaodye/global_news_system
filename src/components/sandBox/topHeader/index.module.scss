@@ -1,0 +1,17 @@
+.header {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .trigger {
+    transition: all 0.3s;
+    &:hover {
+      color: #1890ff;
+    }
+  }
+
+  .header_rg {
+    display: flex;
+    align-items: center;
+  }
+}
