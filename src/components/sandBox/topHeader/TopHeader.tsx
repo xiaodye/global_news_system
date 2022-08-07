@@ -1,42 +1,23 @@
-import { Dropdown, Layout, Menu } from "antd"
-import React, { ReactNode, useState } from "react"
-import { MenuFoldOutlined, MenuUnfoldOutlined, DownOutlined, SmileOutlined } from "@ant-design/icons"
+import { Avatar, Dropdown, Layout, Menu } from "antd"
+import React, { useState } from "react"
+import { MenuFoldOutlined, MenuUnfoldOutlined, SmileOutlined, LogoutOutlined } from "@ant-design/icons"
 import styles from "./index.module.scss"
+import { ItemType } from "antd/lib/menu/hooks/useItems"
 
 const { Header } = Layout
 
-/**
- * menuItemType
- */
-interface menuItemType {
-  key: string
-  label: string
-  danger?: boolean
-  disabled?: boolean
-  icon?: ReactNode
-  title?: string
-}
-
 const TopHeader: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
-  const [menuItemList] = useState<menuItemType[]>([
+  const [menuItemList] = useState<ItemType[]>([
     {
       key: "item-1",
-      label: "1st menu item",
-    },
-    {
-      key: "item-2",
-      label: "menu item(disabled)",
-      disabled: true,
-    },
-    {
-      key: "item-3",
-      label: "menu item icon",
+      label: "超级管理员",
       icon: <SmileOutlined />,
     },
     {
-      key: "item-4",
+      key: "item-2",
       label: "退出登录",
+      icon: <LogoutOutlined />,
       danger: true,
     },
   ])
@@ -49,10 +30,12 @@ const TopHeader: React.FC = () => {
         onClick: () => setCollapsed(!collapsed),
       })}
 
-      <div className={styles.header_rg}>
-        <div>欢迎admin回来</div>
+      <div className={styles["header-rg"]}>
+        <div className={styles["header-rg-tip"]}>欢迎超级管理员回来！</div>
         <Dropdown overlay={<Menu items={menuItemList} />}>
-          <span>Hover me</span>
+          <Avatar size={40} style={{ color: "#f56a00", backgroundColor: "#fde3cf" }}>
+            L
+          </Avatar>
         </Dropdown>
       </div>
     </Header>

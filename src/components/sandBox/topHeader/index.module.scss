@@ -10,8 +10,16 @@
     }
   }
 
-  .header_rg {
+  .header-rg {
     display: flex;
     align-items: center;
+    .header-rg-tip {
+      font-weight: bold;
+      font-size: 20px;
+      margin-right: 40px;
+      color: transparent;
+      background-clip: text;
+      background-image: linear-gradient(120deg, #a6c0fe 0%, #f68084 100%);
+    }
   }
 }

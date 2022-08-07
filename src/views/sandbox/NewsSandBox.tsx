@@ -29,7 +29,9 @@ const NewsSandBox: React.FC = () => {
         >
           <Switch>
             <Route path={"/home"} component={Home} />
+            <Route path={"/user-manage"} component={UserList} />
             <Route path={"/user-manage/list"} component={UserList} />
+            <Route path={"/right-manage"} component={RoleList} />
             <Route path={"/right-manage/role/list"} component={RoleList} />
             <Route path={"/right-manage/right/list"} component={RightList} />
 
