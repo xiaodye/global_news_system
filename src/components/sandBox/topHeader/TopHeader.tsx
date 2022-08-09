@@ -4,8 +4,6 @@ import { MenuFoldOutlined, MenuUnfoldOutlined, SmileOutlined, LogoutOutlined } f
 import styles from "./index.module.scss"
 import { ItemType } from "antd/lib/menu/hooks/useItems"
 
-const { Header } = Layout
-
 const TopHeader: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [menuItemList] = useState<ItemType[]>([
@@ -23,7 +21,7 @@ const TopHeader: React.FC = () => {
   ])
 
   return (
-    <Header className={styles.header} style={{ padding: "0 20px", backgroundColor: "#fff" }}>
+    <Layout.Header className={styles.header} style={{ padding: "0 20px", backgroundColor: "#fff" }}>
       {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
         className: styles.trigger,
         style: { fontSize: "20px" },
@@ -38,7 +36,7 @@ const TopHeader: React.FC = () => {
           </Avatar>
         </Dropdown>
       </div>
-    </Header>
+    </Layout.Header>
   )
 }
 

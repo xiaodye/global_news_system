@@ -5,57 +5,95 @@ import styles from "./index.module.scss"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
 
-const { Sider } = Layout
-const { SubMenu } = Menu
-
 interface menuItemType {
   id: string
   label: string
+  title: string
   key: string
-  pagepermisson?: number
+  pagepermisson?: 0 | 1
   grade?: number
   rightId?: number
   children?: menuItemType[]
-  icon?: ReactNode
+}
+
+type iconMapType = {
+  [propName: string]: ReactNode
+}
+
+const iconList: iconMapType = {
+  "/home": <UserOutlined />,
+  "/user-manage": <VideoCameraOutlined />,
+  "/user-manage/list": <UserOutlined />,
+  "/right-manage": <UploadOutlined />,
+  "/right-manage/role/list": <UserOutlined />,
+  "/right-manage/right/list": <UserOutlined />,
+  //.......
 }
 
 const SideMenu: React.FC = () => {
   const [collapsed] = useState(false)
   const [menuItemList, setMenuItemList] = useState<menuItemType[]>([])
   const history = useHistory()
-  const [openKeys, setOpenKeys] = useState<string[]>(["/" + history.location.pathname.split("/")[1]])
+  const [openKeys, setOpenKeys] = useState<string[]>([])
 
   useEffect(() => {
     axios.get("http://localhost:5001/rights?_embed=children").then((res) => {
       if (res.status !== 200) return console.error("服务器异常")
-      res.data.forEach((item: menuItemType) => {
-        if (item.children?.length === 0) return delete item.children
-        item.children = item.children?.filter((item: menuItemType) => item.pagepermisson === 1)
-      })
       console.log(res.data)
-      setMenuItemList(filterMenuItemList(res.data))
+      setMenuItemList(res.data)
     })
   }, [])
 
-  const filterMenuItemList = (itemList: menuItemType[]) => {
-    return itemList.filter((item: menuItemType) => item.pagepermisson === 1)
+  useEffect(() => {
+    setOpenKeys(["/" + history.location.pathname.split("/")[1]])
+  }, [history.location.pathname])
+
+  /**
+   * 检查菜单项的权限
+   * @param item 菜单项
+   * @returns 0 | 1 | undefined
+   */
+  const checkPagePermission = (item: menuItemType): 0 | 1 | undefined => item.pagepermisson
+
+  /**
+   * 渲染菜单
+   * @param menuItemList 菜单项列表
+   * @returns 待渲染的html
+   */
+  const renderMenu = (menuItemList: menuItemType[]) => {
+    return menuItemList.map((item) => {
+      if (!checkPagePermission(item)) return <></>
+      if (item.children !== undefined && item.children.length > 0) {
+        return (
+          <Menu.SubMenu key={item.key} title={item.title} icon={iconList[item.key]}>
+            {renderMenu(item.children)}
+          </Menu.SubMenu>
+        )
+      }
+      return (
+        <Menu.Item key={item.key} icon={iconList[item.key]} onClick={() => history.push(item.key)}>
+          {item.title}
+        </Menu.Item>
+      )
+    })
   }
 
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed}>
+    <Layout.Sider trigger={null} collapsible collapsed={collapsed}>
       <div className={styles.logo}>
         <span>全球新闻系统</span>
       </div>
+
       <Menu
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[history.location.pathname]}
         openKeys={openKeys}
-        items={menuItemList}
-        onClick={({ key }) => history.push(key)}
         onOpenChange={(openKeys) => setOpenKeys(openKeys)}
-      />
-    </Sider>
+      >
+        {renderMenu(menuItemList)}
+      </Menu>
+    </Layout.Sider>
   )
 }
 
