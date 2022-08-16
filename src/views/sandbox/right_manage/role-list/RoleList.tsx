@@ -1,9 +1,8 @@
-import { Button, Modal, Table } from "antd"
+import { Button, Modal, Table, Tag, Tree } from "antd"
 import { ColumnsType } from "antd/lib/table"
 import axios from "axios"
-import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from "@ant-design/icons"
+import { DeleteOutlined, UnorderedListOutlined, ExclamationCircleOutlined } from "@ant-design/icons"
 import React, { useEffect, useState } from "react"
-import { render } from "react-dom"
 
 type roleType = {
   id: number
@@ -12,8 +11,12 @@ type roleType = {
   rights: string[]
 }
 
-export default function RoleList() {
+const RoleList: React.FC = () => {
   const [dataSource, setDataSource] = useState<roleType[]>([])
+  const [modalVisible, setModalVisible] = useState(false)
+  const [rightList, setRightList] = useState([])
+  const [currentRights, setCurrentRights] = useState<string[]>([])
+  const [currentRoleId, setCurrentRoleId] = useState(0)
 
   const colums: ColumnsType<roleType> = [
     {
@@ -26,13 +29,21 @@ export default function RoleList() {
     {
       title: "角色名称",
       dataIndex: "roleName",
+      render: (roleName: string) => <Tag color="#87d068">{roleName}</Tag>,
     },
     {
       title: "操作",
       render: (role: roleType) => {
         return (
           <>
-            <Button danger shape="circle" icon={<DeleteOutlined />} onClick={() => confirmHandle(role)}></Button>
+            <Button danger shape="circle" icon={<DeleteOutlined />} onClick={() => confirmHandle(role)} />
+            <Button
+              style={{ marginLeft: "10px" }}
+              type="primary"
+              shape="circle"
+              icon={<UnorderedListOutlined />}
+              onClick={() => editHandle(role)}
+            />
           </>
         )
       },
@@ -46,6 +57,13 @@ export default function RoleList() {
     })
   }, [])
 
+  useEffect(() => {
+    axios.get("http://localhost:5001/rights?_embed=children").then((res) => {
+      console.log(res.data)
+      setRightList(res.data)
+    })
+  }, [])
+
   const confirmHandle = (role: roleType) => {
     Modal.confirm({
       title: "确定要删除吗？",
@@ -54,8 +72,38 @@ export default function RoleList() {
         setDataSource(dataSource.filter((data) => data.id !== role.id))
         axios.delete(`http://localhost:5001/roles/${role.id}`)
       },
+      onCancel: () => {},
     })
   }
 
-  return <Table dataSource={dataSource} columns={colums} rowKey={(item) => item.id} />
+  const editHandle = (role: roleType) => {
+    setModalVisible(true)
+    setCurrentRights(role.rights)
+    setCurrentRoleId(role.id)
+  }
+
+  const modalOkHandle = () => {
+    setDataSource(dataSource.map((role) => (role.id === currentRoleId ? { ...role, rights: currentRights } : role)))
+    axios.patch(`http://localhost:5001/roles/${currentRoleId}`, { rights: currentRights })
+    setModalVisible(false)
+  }
+
+  const onCheck = (checkedKeys: any) => setCurrentRights(checkedKeys)
+
+  return (
+    <>
+      <Table dataSource={dataSource} columns={colums} rowKey={(item) => item.id} pagination={{ pageSize: 8 }} />
+      <Modal visible={modalVisible} title="权限分配" onOk={modalOkHandle} onCancel={() => setModalVisible(false)}>
+        <Tree
+          checkable
+          checkedKeys={currentRights}
+          checkStrictly
+          onCheck={(checkedKeys) => onCheck(checkedKeys)}
+          treeData={rightList}
+        />
+      </Modal>
+    </>
+  )
 }
+
+export default RoleList
