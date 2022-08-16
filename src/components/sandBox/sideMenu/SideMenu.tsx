@@ -7,7 +7,6 @@ import { useHistory } from "react-router-dom"
 
 interface menuItemType {
   id: string
-  label: string
   title: string
   key: string
   pagepermisson?: 0 | 1
@@ -61,21 +60,22 @@ const SideMenu: React.FC = () => {
    * @returns 待渲染的html
    */
   const renderMenu = (menuItemList: menuItemType[]) => {
-    return menuItemList.map((item) => {
-      if (!checkPagePermission(item)) return <></>
-      if (item.children !== undefined && item.children.length > 0) {
+    return menuItemList
+      .filter((menuItem) => checkPagePermission(menuItem))
+      .map((menuItem) => {
+        if (menuItem.children !== undefined && menuItem.children.length > 0) {
+          return (
+            <Menu.SubMenu key={menuItem.key} title={menuItem.title} icon={iconList[menuItem.key]}>
+              {renderMenu(menuItem.children)}
+            </Menu.SubMenu>
+          )
+        }
         return (
-          <Menu.SubMenu key={item.key} title={item.title} icon={iconList[item.key]}>
-            {renderMenu(item.children)}
-          </Menu.SubMenu>
+          <Menu.Item key={menuItem.key} icon={iconList[menuItem.key]} onClick={() => history.push(menuItem.key)}>
+            {menuItem.title}
+          </Menu.Item>
         )
-      }
-      return (
-        <Menu.Item key={item.key} icon={iconList[item.key]} onClick={() => history.push(item.key)}>
-          {item.title}
-        </Menu.Item>
-      )
-    })
+      })
   }
 
   return (
