@@ -3,8 +3,11 @@ import React, { useState } from "react"
 import { MenuFoldOutlined, MenuUnfoldOutlined, SmileOutlined, LogoutOutlined } from "@ant-design/icons"
 import styles from "./index.module.scss"
 import { ItemType } from "antd/lib/menu/hooks/useItems"
+import { useHistory } from "react-router-dom"
+import { MenuInfo } from "rc-menu/lib/interface"
 
 const TopHeader: React.FC = () => {
+  const history = useHistory()
   const [collapsed, setCollapsed] = useState(false)
   const [menuItemList] = useState<ItemType[]>([
     {
@@ -20,6 +23,10 @@ const TopHeader: React.FC = () => {
     },
   ])
 
+  const logout = (detail: MenuInfo) => {
+    detail.key === "item-2" && history.replace("/login")
+  }
+
   return (
     <Layout.Header className={styles.header} style={{ padding: "0 20px", backgroundColor: "#fff" }}>
       {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
@@ -30,7 +37,7 @@ const TopHeader: React.FC = () => {
 
       <div className={styles["header-rg"]}>
         <div className={styles["header-rg-tip"]}>欢迎超级管理员回来！</div>
-        <Dropdown overlay={<Menu items={menuItemList} />}>
+        <Dropdown overlay={<Menu items={menuItemList} onClick={logout} />}>
           <Avatar size={40} style={{ color: "#f56a00", backgroundColor: "#fde3cf" }}>
             L
           </Avatar>

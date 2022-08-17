@@ -4,7 +4,6 @@ import axios from "axios"
 import { DeleteOutlined, DotChartOutlined, ExclamationCircleOutlined } from "@ant-design/icons"
 import React, { useEffect, useRef, useState } from "react"
 import UserForm from "@/components/userForm"
-import { Value } from "sass"
 
 type roleType = {
   id: number
@@ -39,7 +38,6 @@ const UserList: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<userType>()
   const addForm = useRef<FormInstance>(null)
   const updateForm = useRef<FormInstance>(null)
-
   const [regionDisabled, setRegionDisabled] = useState(false)
 
   const columns: ColumnsType<userType> = [
