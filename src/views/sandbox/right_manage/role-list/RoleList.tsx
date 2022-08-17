@@ -18,7 +18,7 @@ const RoleList: React.FC = () => {
   const [currentRights, setCurrentRights] = useState<string[]>([])
   const [currentRoleId, setCurrentRoleId] = useState(0)
 
-  const colums: ColumnsType<roleType> = [
+  const columns: ColumnsType<roleType> = [
     {
       title: "ID",
       dataIndex: "id",
@@ -77,9 +77,9 @@ const RoleList: React.FC = () => {
   }
 
   const editHandle = (role: roleType) => {
-    setModalVisible(true)
     setCurrentRights(role.rights)
     setCurrentRoleId(role.id)
+    setModalVisible(true)
   }
 
   const modalOkHandle = () => {
@@ -92,7 +92,7 @@ const RoleList: React.FC = () => {
 
   return (
     <>
-      <Table dataSource={dataSource} columns={colums} rowKey={(item) => item.id} pagination={{ pageSize: 8 }} />
+      <Table dataSource={dataSource} columns={columns} rowKey={(item) => item.id} pagination={{ pageSize: 8 }} />
       <Modal visible={modalVisible} title="权限分配" onOk={modalOkHandle} onCancel={() => setModalVisible(false)}>
         <Tree
           checkable
