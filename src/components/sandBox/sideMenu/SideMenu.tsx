@@ -4,6 +4,7 @@ import { UploadOutlined, UserOutlined, VideoCameraOutlined } from "@ant-design/i
 import styles from "./index.module.scss"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
+import { userType } from "@/res_data_type"
 
 interface menuItemType {
   id: string
@@ -30,6 +31,7 @@ const iconList: iconMapType = {
 }
 
 const SideMenu: React.FC = () => {
+  const [userInfo] = useState<userType>(JSON.parse(localStorage.getItem("token")!) as userType)
   const [collapsed] = useState(false)
   const [menuItemList, setMenuItemList] = useState<menuItemType[]>([])
   const history = useHistory()
@@ -50,9 +52,11 @@ const SideMenu: React.FC = () => {
   /**
    * 检查菜单项的权限
    * @param item 菜单项
-   * @returns 0 | 1 | undefined
+   * @returns boolan
    */
-  const checkPagePermission = (item: menuItemType): 0 | 1 | undefined => item.pagepermisson
+  const checkPagePermission = (item: menuItemType): boolean => {
+    return item.pagepermisson === 1 && userInfo.role.rights.includes(item.key)
+  }
 
   /**
    * 渲染菜单

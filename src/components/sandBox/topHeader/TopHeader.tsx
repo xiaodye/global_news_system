@@ -5,14 +5,16 @@ import styles from "./index.module.scss"
 import { ItemType } from "antd/lib/menu/hooks/useItems"
 import { useHistory } from "react-router-dom"
 import { MenuInfo } from "rc-menu/lib/interface"
+import { userType } from "@/res_data_type"
 
 const TopHeader: React.FC = () => {
   const history = useHistory()
+  const [userInfo] = useState<userType>(JSON.parse(localStorage.getItem("token")!) as userType)
   const [collapsed, setCollapsed] = useState(false)
   const [menuItemList] = useState<ItemType[]>([
     {
       key: "item-1",
-      label: "超级管理员",
+      label: userInfo.role.roleName ?? "超级管理员",
       icon: <SmileOutlined />,
     },
     {
@@ -24,7 +26,10 @@ const TopHeader: React.FC = () => {
   ])
 
   const logout = (detail: MenuInfo) => {
-    detail.key === "item-2" && history.replace("/login")
+    if (detail.key === "item-2") {
+      history.replace("/login")
+      localStorage.removeItem("token")
+    }
   }
 
   return (
@@ -36,7 +41,7 @@ const TopHeader: React.FC = () => {
       })}
 
       <div className={styles["header-rg"]}>
-        <div className={styles["header-rg-tip"]}>欢迎超级管理员回来！</div>
+        <div className={styles["header-rg-tip"]}>欢迎{userInfo.username}回来！</div>
         <Dropdown overlay={<Menu items={menuItemList} onClick={logout} />}>
           <Avatar size={40} style={{ color: "#f56a00", backgroundColor: "#fde3cf" }}>
             L

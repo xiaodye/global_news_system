@@ -1,11 +1,28 @@
-import { Button, Form, Input } from "antd"
+import { Button, Form, Input, message } from "antd"
 import { UserOutlined, LockOutlined } from "@ant-design/icons"
 import React from "react"
 import { AppName, FormContainer, LoginContainer } from "./style"
+import axios from "axios"
+import { useHistory } from "react-router-dom"
+import { userType } from "@/res_data_type"
 
 const Login: React.FC = () => {
-  const login = (detail: { username: string; password: string }) => {
-    console.log(detail)
+  const history = useHistory()
+
+  /**
+   * 点击登录
+   * @param userInfo 用户信息
+   */
+  const login = async (userInfo: { username: string; password: string }) => {
+    const res = await axios.get(
+      `http://localhost:5001/users?username=${userInfo.username}&password=${userInfo.password}&roleState=true&_expand=role`
+    )
+    const userList = res.data as userType[]
+    // console.log(userList)
+    if (userList.length === 0) return message.error("用户名或密码错误")
+    localStorage.setItem("token", JSON.stringify(userList[0]))
+    message.success("登录成功")
+    history.replace("/home")
   }
 
   return (

@@ -4,30 +4,7 @@ import axios from "axios"
 import { DeleteOutlined, DotChartOutlined, ExclamationCircleOutlined } from "@ant-design/icons"
 import React, { useEffect, useRef, useState } from "react"
 import UserForm from "@/components/userForm"
-
-type roleType = {
-  id: number
-  roleName: string
-  roleType: number
-  rights: string[]
-}
-
-type regionType = {
-  id: number
-  title: string
-  value: string
-}
-
-type userType = {
-  id: number
-  username: string
-  password: string | number
-  roleState: boolean
-  default: boolean
-  region: string
-  roleId: number
-  role: roleType
-}
+import { regionType, roleType, userType } from "@/res_data_type"
 
 const UserList: React.FC = () => {
   const [dataSource, setDataSource] = useState<userType[]>([])
@@ -39,6 +16,8 @@ const UserList: React.FC = () => {
   const addForm = useRef<FormInstance>(null)
   const updateForm = useRef<FormInstance>(null)
   const [regionDisabled, setRegionDisabled] = useState(false)
+
+  const { roleId, region, username }: userType = JSON.parse(localStorage.getItem("token")!)
 
   const columns: ColumnsType<userType> = [
     {
@@ -86,10 +65,21 @@ const UserList: React.FC = () => {
   ]
 
   useEffect(() => {
-    axios.get(`http://localhost:5001/users?_expand=role`).then((res) => setDataSource(res.data))
+    axios.get(`http://localhost:5001/users?_expand=role`).then((res) => {
+      const userList = res.data as userType[]
+      setDataSource(
+        roleId === 1
+          ? userList
+          : [
+              userList.find((user) => user.username === username)!,
+              ...userList.filter((user) => user.region === region && user.roleId === 3),
+            ]
+      )
+    })
+
     axios.get("http://localhost:5001/roles").then((res) => setRoleList(res.data))
     axios.get("http://localhost:5001/regions").then((res) => setRegionList(res.data))
-  }, [])
+  }, [roleId, region, username])
 
   /**
    * 确认添加用户处理函数
@@ -188,7 +178,7 @@ const UserList: React.FC = () => {
         onOk={addModalOkHandle}
         onCancel={() => setAddModalVisble(false)}
       >
-        <UserForm roleList={roleList} regionList={regionList} ref={addForm} />
+        <UserForm formType="add" roleList={roleList} regionList={regionList} ref={addForm} />
       </Modal>
 
       {/* 更新用户模态框 */}
@@ -203,7 +193,13 @@ const UserList: React.FC = () => {
           setRegionDisabled(!regionDisabled)
         }}
       >
-        <UserForm roleList={roleList} regionList={regionList} regionDisabled={regionDisabled} ref={updateForm} />
+        <UserForm
+          formType="update"
+          roleList={roleList}
+          regionList={regionList}
+          regionDisabled={regionDisabled}
+          ref={updateForm}
+        />
       </Modal>
     </>
   )

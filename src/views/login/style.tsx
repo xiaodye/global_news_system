@@ -29,7 +29,6 @@ const AppName = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* height: 80px; */
   font-size: 28px;
   color: transparent;
   background-clip: text;
